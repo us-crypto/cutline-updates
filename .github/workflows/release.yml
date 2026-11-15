@@ -102,8 +102,8 @@ jobs:
               "versionCode": int(os.environ["VERSION_CODE"]),
               "versionName": os.environ["VERSION_NAME"],
               "notes": os.environ["NOTES"],
-              "apk": "https://github.com/%s/releases/download/android-%s/Cutline-%s.apk"
-                     % (os.environ["GITHUB_REPOSITORY"], os.environ["VERSION_NAME"], os.environ["VERSION_NAME"]),
+              # Served from the repository itself: release downloads time out on some connections.
+              "apk": "https://raw.githubusercontent.com/%s/main/Cutline.apk" % os.environ["GITHUB_REPOSITORY"],
               "sha256": "$SHA",
           }
           with open("android.json", "w") as handle:
@@ -112,6 +112,7 @@ jobs:
           PY
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add android.json
+          cp "../$APK" Cutline.apk
+          git add android.json Cutline.apk
           git commit -m "Point the Android update feed at Cutline $VERSION_NAME"
           git push
