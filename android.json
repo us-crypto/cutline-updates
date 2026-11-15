@@ -2,6 +2,6 @@
   "versionCode": 2,
   "versionName": "1.1.2",
   "notes": "Now installs on Android 8 and newer, including older 32-bit phones. Fixes saving videos on older Android.",
-  "apk": "https://github.com/us-crypto/cutline-updates/releases/download/android-1.1.2/Cutline-1.1.2.apk",
+  "apk": "https://raw.githubusercontent.com/us-crypto/cutline-updates/main/Cutline.apk",
   "sha256": "30b791479724aa637c60f714608b53c52d556a919866dc12f81a753096849fb5"
 }
