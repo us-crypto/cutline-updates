@@ -1,0 +1,117 @@
+name: Release Cutline
+
+# Builds the Android app, signs it with your key, publishes the APK here and
+# updates android.json. Every installed copy then updates itself inside the app.
+#
+# Needs two secrets in this repository (Settings > Secrets and variables > Actions):
+#   KEYSTORE_BASE64    the signing key file, as base64 text
+#   KEYSTORE_PASSWORD  the password of that key file
+
+on:
+  workflow_dispatch:
+    inputs:
+      notes:
+        description: "What changed (shown on the update screen)"
+        required: true
+        default: "Improvements and fixes."
+      branch:
+        description: "Branch of the app to build"
+        required: true
+        default: "android-app"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Check the signing key is set
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ] || [ -z "$KEYSTORE_PASSWORD" ]; then
+            echo "::error::Add the secrets KEYSTORE_BASE64 and KEYSTORE_PASSWORD to this repository first."
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.p12"
+          echo "CUTLINE_KEYSTORE=$RUNNER_TEMP/release.p12" >> "$GITHUB_ENV"
+
+      - name: Get this repository
+        uses: actions/checkout@v4
+        with:
+          path: feed
+
+      - name: Get the app
+        uses: actions/checkout@v4
+        with:
+          repository: us-crypto/cutline
+          ref: ${{ inputs.branch }}
+          path: app-src
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Read the version
+        run: |
+          NAME=$(grep '^version.name=' app-src/config/app.properties | cut -d= -f2 | tr -d '[:space:]')
+          CODE=$(grep '^version.code=' app-src/config/app.properties | cut -d= -f2 | tr -d '[:space:]')
+          echo "VERSION_NAME=$NAME" >> "$GITHUB_ENV"
+          echo "VERSION_CODE=$CODE" >> "$GITHUB_ENV"
+          echo "Building Cutline $NAME ($CODE)"
+
+      - name: Stop if this version was already released
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "android-$VERSION_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "::error::Cutline $VERSION_NAME is already released. Raise version.code and version.name in config/app.properties first."
+            exit 1
+          fi
+
+      - name: Build and sign
+        working-directory: app-src
+        env:
+          CUTLINE_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: ./gradlew --stacktrace :app:testDirectReleaseUnitTest :app:assembleDirectRelease :app:bundlePlayRelease
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NOTES: ${{ inputs.notes }}
+        run: |
+          APK="Cutline-$VERSION_NAME.apk"
+          AAB="Cutline-$VERSION_NAME-play.aab"
+          cp app-src/app/build/outputs/apk/direct/release/app-direct-release.apk "$APK"
+          cp app-src/app/build/outputs/bundle/playRelease/app-play-release.aab "$AAB"
+          SHA=$(sha256sum "$APK" | cut -d' ' -f1)
+          gh release create "android-$VERSION_NAME" "$APK" "$AAB" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Cutline $VERSION_NAME for Android" \
+            --notes "$NOTES"
+          cd feed
+          python3 - <<PY
+          import json, os
+          feed = {
+              "versionCode": int(os.environ["VERSION_CODE"]),
+              "versionName": os.environ["VERSION_NAME"],
+              "notes": os.environ["NOTES"],
+              "apk": "https://github.com/%s/releases/download/android-%s/Cutline-%s.apk"
+                     % (os.environ["GITHUB_REPOSITORY"], os.environ["VERSION_NAME"], os.environ["VERSION_NAME"]),
+              "sha256": "$SHA",
+          }
+          with open("android.json", "w") as handle:
+              json.dump(feed, handle, indent=2)
+              handle.write("\n")
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add android.json
+          git commit -m "Point the Android update feed at Cutline $VERSION_NAME"
+          git push
