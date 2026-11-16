@@ -1,7 +1,7 @@
 {
-  "versionCode": 2,
-  "versionName": "1.1.2",
-  "notes": "Now installs on Android 8 and newer, including older 32-bit phones. Fixes saving videos on older Android.",
+  "versionCode": 3,
+  "versionName": "1.1.3",
+  "notes": "Full video editor: join and split clips, speed, crop, filters, transitions, text, stickers, music and voiceover. Smart tools: auto edit, cut silences, remove ums, auto zoom. Persian captions. Drafts save themselves. Better caption timing and spelling.",
   "apk": "https://raw.githubusercontent.com/us-crypto/cutline-updates/main/Cutline.apk",
-  "sha256": "30b791479724aa637c60f714608b53c52d556a919866dc12f81a753096849fb5"
+  "sha256": "c96faf29312d1667437ced6af32e80d8c04f8b606088eef88290f1dceaf54a37"
 }
