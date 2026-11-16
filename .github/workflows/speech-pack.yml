@@ -1,0 +1,34 @@
+name: speech-pack
+
+# Stores the Persian speech pack in this repository, split into parts small enough to be
+# served directly. The app downloads the parts, joins them and checks the result.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  pack:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch and split
+        run: |
+          mkdir -p speech
+          curl -sSL --retry 4 -o "$RUNNER_TEMP/fa.bin" https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small-q5_1.bin
+          ls -la "$RUNNER_TEMP/fa.bin"
+          rm -f speech/fa.part*
+          split -b 95000000 -d -a 1 "$RUNNER_TEMP/fa.bin" speech/fa.part
+          ls -la speech
+          SHA=$(sha256sum "$RUNNER_TEMP/fa.bin" | cut -d' ' -f1)
+          BYTES=$(stat -c %s "$RUNNER_TEMP/fa.bin")
+          printf '{"sha256": "%s", "bytes": %s, "parts": %s}\n' "$SHA" "$BYTES" "$(ls speech/fa.part* | wc -l)" > speech/fa.json
+          cat speech/fa.json
+      - name: Save
+        run: |
+          git config user.name us-crypto
+          git config user.email 85217606+us-crypto@users.noreply.github.com
+          git add speech
+          git commit -m "Persian speech pack" || exit 0
+          git push
