@@ -1,7 +1,7 @@
 {
-  "versionCode": 3,
-  "versionName": "1.1.3",
-  "notes": "Full video editor: join and split clips, speed, crop, filters, transitions, text, stickers, music and voiceover. Smart tools: auto edit, cut silences, remove ums, auto zoom. Persian captions. Drafts save themselves. Better caption timing and spelling.",
+  "versionCode": 4,
+  "versionName": "1.1.4",
+  "notes": "A familiar editor: pinch to zoom the timeline, drag to trim and move, layers, sound rows with waves, detach audio, copy and paste. Green screen, masks, keyframes and new transitions. 33 sound effects. AI auto edit that watches before it cuts. Captions that hear through noise and stay in time, now with a Professional English pack and Persian.",
   "apk": "https://raw.githubusercontent.com/us-crypto/cutline-updates/main/Cutline.apk",
-  "sha256": "c96faf29312d1667437ced6af32e80d8c04f8b606088eef88290f1dceaf54a37"
+  "sha256": "e1dd73ddaf1a43e8e2af144a070b5dc207e4be6ea962f820c8b092bc0dcefd97"
 }
