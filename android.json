@@ -1,7 +1,7 @@
 {
-  "versionCode": 4,
-  "versionName": "1.1.4",
-  "notes": "A familiar editor: pinch to zoom the timeline, drag to trim and move, layers, sound rows with waves, detach audio, copy and paste. Green screen, masks, keyframes and new transitions. 33 sound effects. AI auto edit that watches before it cuts. Captions that hear through noise and stay in time, now with a Professional English pack and Persian.",
+  "versionCode": 5,
+  "versionName": "1.1.5",
+  "notes": "Precut, freeze frame, reverse, stabilizer, cut out and smart reframe. Effects library, privacy blur boxes, speed curves, colour or photo backgrounds, more adjust sliders and your own .cube looks. Text animations, edit by text, auto emojis, .srt import, text to speech, beat marks, guides and a voice enhancer. Hold a clip to rearrange it or drop it on a layer.",
   "apk": "https://raw.githubusercontent.com/us-crypto/cutline-updates/main/Cutline.apk",
-  "sha256": "e1dd73ddaf1a43e8e2af144a070b5dc207e4be6ea962f820c8b092bc0dcefd97"
+  "sha256": "bb9318fa21b1cf7143ddceee0f880079f1bff4010569e28f8c7e880d47ccb32f"
 }
