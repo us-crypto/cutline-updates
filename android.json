@@ -1,7 +1,7 @@
 {
-  "versionCode": 5,
-  "versionName": "1.1.5",
-  "notes": "Precut, freeze frame, reverse, stabilizer, cut out and smart reframe. Effects library, privacy blur boxes, speed curves, colour or photo backgrounds, more adjust sliders and your own .cube looks. Text animations, edit by text, auto emojis, .srt import, text to speech, beat marks, guides and a voice enhancer. Hold a clip to rearrange it or drop it on a layer.",
+  "versionCode": 6,
+  "versionName": "1.1.6",
+  "notes": "Sharper captions: new Ultra engine (English and Persian), a sensitivity slider and far fewer made-up words. Caption engines download once and stay through updates. The editor is laid out like familiar phone editors. App language: English or Persian. Smarter AI edit that skips repeats, opens with your strongest line and uses gentle sounds. Export frame rate and size.",
   "apk": "https://raw.githubusercontent.com/us-crypto/cutline-updates/main/Cutline.apk",
-  "sha256": "bb9318fa21b1cf7143ddceee0f880079f1bff4010569e28f8c7e880d47ccb32f"
+  "sha256": "f4d598be05a965f5454cfdc3eaba9be23a8ab0b59ded9dbd4745e114c2ed04eb"
 }
