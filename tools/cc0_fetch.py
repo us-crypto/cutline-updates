@@ -10,11 +10,13 @@ Output:
   music/<id>.m4a + music.json  the music library, grouped by mood
   cc0/proof/                   the source pages, as a record of the licence
 """
-import json, os, re, subprocess, sys, urllib.request, urllib.parse, zipfile, io, hashlib
+import json, os, re, subprocess, sys, urllib.request, urllib.parse, zipfile, io, hashlib, http.cookiejar
 
 UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64)"}
+JAR = http.cookiejar.CookieJar()
+OPENER = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(JAR))
 KENNEY = ["interface-sounds", "impact-sounds", "digital-audio", "ui-audio", "casino-audio",
-          "music-jingles", "sci-fi-sounds", "rpg-audio", "ui-pack-sounds", "foley-sounds"]
+          "music-jingles", "sci-fi-sounds", "rpg-audio"]
 MOODS = {  # FreePD page -> mood shown in the app
     "upbeat": "Happy", "electronic": "Energetic", "epic": "Epic", "romantic": "Calm",
     "comedy": "Funny", "scoring": "Cinematic", "world": "World", "misc": "Chill",
@@ -23,9 +25,9 @@ PER_MOOD = 6
 MAX_SECONDS = 150
 
 
-def get(url):
-    req = urllib.request.Request(url, headers=UA)
-    with urllib.request.urlopen(req, timeout=60) as r:
+def get(url, referer=None):
+    req = urllib.request.Request(url, headers=dict(UA, Referer=referer or url))
+    with OPENER.open(req, timeout=120) as r:
         return r.read()
 
 
@@ -47,12 +49,13 @@ def kenney():
         except Exception as e:
             print("kenney page failed", slug, e); continue
         open(f"cc0/proof/kenney-{slug}.html", "w").write(page)
-        links = re.findall(r'https://kenney\.nl/media/pages/assets/[^"\']+?\.zip', page)
-        if not links:
-            print("no zip on", slug); continue
-        print("kenney", slug, links[0])
+        ids = re.findall(r"data-download-id='([0-9a-f]+)'", page)
+        if not ids:
+            print("no download on", slug); continue
         try:
-            data = get(links[0])
+            link = json.loads(get("https://kenney.nl/download-link/" + ids[0], f"https://kenney.nl/assets/{slug}"))["url"]
+            print("kenney", slug, link)
+            data = get(link, f"https://kenney.nl/assets/{slug}")
         except Exception as e:
             print("zip failed", slug, e); continue
         z = zipfile.ZipFile(io.BytesIO(data))
@@ -73,19 +76,30 @@ def kenney():
 def freepd():
     os.makedirs("music", exist_ok=True)
     catalog = []
-    for page_name, mood in MOODS.items():
-        url = f"https://freepd.com/{page_name}.php"
+    home = get("https://freepd.com/").decode("utf-8", "ignore")
+    open("cc0/proof/freepd-home.html", "w").write(home)
+    pages = {}
+    for href in re.findall(r'href=["\']([^"\']+)["\']', home):
+        full = urllib.parse.urljoin("https://freepd.com/", href)
+        if full.startswith("https://freepd.com/") and not full.endswith((".mp3", ".css", ".js", ".png", ".jpg")):
+            pages.setdefault(full, None)
+    print("freepd pages:", list(pages))
+    for url in pages:
+        slug = url.rstrip("/").rsplit("/", 1)[-1].split(".")[0].lower()
+        mood = next((m for k, m in MOODS.items() if k in slug), None)
+        if mood is None:
+            continue
         try:
             page = get(url).decode("utf-8", "ignore")
         except Exception as e:
             print("freepd page failed", url, e); continue
-        open(f"cc0/proof/freepd-{page_name}.html", "w").write(page)
+        open(f"cc0/proof/freepd-{slug}.html", "w").write(page)
         links = []
         for href in re.findall(r'["\']([^"\']+?\.mp3)["\']', page):
             full = urllib.parse.urljoin(url, href)
             if full not in links:
                 links.append(full)
-        print("freepd", page_name, len(links), "tracks")
+        print("freepd", slug, mood, len(links), "tracks")
         taken = 0
         for link in links:
             if taken >= PER_MOOD:
