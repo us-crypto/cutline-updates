@@ -59,6 +59,15 @@ if [ ! -x "$RUNNER_DIR/config.sh" ]; then
   "$RUNNER_DIR/bin/installdependencies.sh" >/dev/null
 fi
 printf "ANDROID_HOME=%s\nANDROID_SDK_ROOT=%s\nLANG=C.UTF-8\n" "$SDK" "$SDK" > "$RUNNER_DIR/.env"
+mkdir -p /home/builder/.gradle
+cat > /home/builder/.gradle/gradle.properties <<'PROPS'
+# This server has little memory: these settings win over each project's own.
+org.gradle.jvmargs=-Xmx2560m -XX:MaxMetaspaceSize=768m -Dfile.encoding=UTF-8
+org.gradle.workers.max=2
+org.gradle.parallel=false
+kotlin.daemon.jvmargs=-Xmx1536m
+PROPS
+chown -R builder:builder /home/builder/.gradle
 chown -R builder:builder /home/builder
 
 # Lets the runner start itself as a service once registered.
