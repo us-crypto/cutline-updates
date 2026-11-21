@@ -54,8 +54,12 @@ hook_env() {
   grep -q ACTIONS_RUNNER_HOOK_JOB_COMPLETED "$env" || echo "ACTIONS_RUNNER_HOOK_JOB_COMPLETED=/usr/local/bin/build-queue-end" >> "$env"
   grep -q ANDROID_HOME "$env" || printf "ANDROID_HOME=/opt/android-sdk\nANDROID_SDK_ROOT=/opt/android-sdk\nLANG=C.UTF-8\n" >> "$env"
 }
-for dir in $(find / -xdev -name .runner -path "*/home/*" -printf "%h\n" 2>/dev/null; find /opt /root -maxdepth 4 -name .runner -printf "%h\n" 2>/dev/null); do
+for unit in /etc/systemd/system/actions.runner.*.service; do
+  dir=$(sed -n 's/^WorkingDirectory=//p' "$unit")
+  [ -d "$dir" ] || continue
   hook_env "$dir"
+  chown builder:builder "$dir/.env" 2>/dev/null || true
+  echo "queue on: $dir"
 done
 
 # Adds one app: connect-runner ./config.sh --url https://github.com/OWNER/REPO --token XXXX
