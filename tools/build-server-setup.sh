@@ -70,6 +70,10 @@ set -e
 cd /home/builder/runner
 sudo -u builder ./config.sh --unattended --labels android "$@"
 ./svc.sh install builder
+# Start again by itself after a crash or a restart of the server.
+unit=$(ls /etc/systemd/system/actions.runner.*.service | head -1)
+mkdir -p "$unit.d" && printf "[Service]\nRestart=always\nRestartSec=10\n" > "$unit.d/restart.conf"
+systemctl daemon-reload
 ./svc.sh start
 echo "CONNECTED. Tell Claude: done"
 EOF
