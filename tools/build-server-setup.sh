@@ -12,9 +12,11 @@ if [ "$code" != "200" ]; then
 fi
 
 echo "== Extra memory (swap), so big builds don't run out"
-if ! swapon --show | grep -q /swapfile; then
+if [ "$(( $(stat -c %s /swapfile 2>/dev/null || echo 0) / 1073741824 ))" -lt 8 ]; then
+  swapoff /swapfile 2>/dev/null || true
+  rm -f /swapfile
   fallocate -l 8G /swapfile && chmod 600 /swapfile && mkswap /swapfile >/dev/null && swapon /swapfile
-  grep -q /swapfile /etc/fstab || echo "/swapfile none swap sw 0 0" >> /etc/fstab
+  grep -q "^/swapfile" /etc/fstab || echo "/swapfile none swap sw 0 0" >> /etc/fstab
 fi
 
 echo "== Tools"
