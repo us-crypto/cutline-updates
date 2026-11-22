@@ -1,7 +1,7 @@
 {
-  "versionCode": 6,
-  "versionName": "1.1.6",
-  "notes": "Sharper captions: new Ultra engine (English and Persian), a sensitivity slider and far fewer made-up words. Caption engines download once and stay through updates. The editor is laid out like familiar phone editors. App language: English or Persian. Smarter AI edit that skips repeats, opens with your strongest line and uses gentle sounds. Export frame rate and size.",
+  "versionCode": 7,
+  "versionName": "1.1.7",
+  "notes": "Check doubtful words fast, teach Cutline your names and words, and it learns your fixes. Bleep swear words with a soft sound (or turn it off). New caption looks and your own saved looks. AI edit: pick a length and platform, review every cut and sound, gentle sound effects placed with care. Free background music by mood. Brand kit: logo, look and handle in one tap. Export presets for TikTok, YouTube, Instagram and chats.",
   "apk": "https://raw.githubusercontent.com/us-crypto/cutline-updates/main/Cutline.apk",
-  "sha256": "f4d598be05a965f5454cfdc3eaba9be23a8ab0b59ded9dbd4745e114c2ed04eb"
+  "sha256": "2bcf4aec490b0ed1e3613280226f2c43429abae955cfd7883835c4958af5e643"
 }
