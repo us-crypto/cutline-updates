@@ -21,8 +21,10 @@ dir=$(systemctl show -p WorkingDirectory --value "$unit")
 name=$(grep -o '"agentName": *"[^"]*"' "$dir/.runner" 2>/dev/null | sed -E 's/.*"([^"]*)"$/\1/' || true)
 [ -n "$name" ] || name=$(echo "$unit" | sed -E "s/^actions\.runner\.${key}\.(.*)\.service$/\1/")
 systemctl stop "$unit" || true
-rm -f "$dir/.runner" "$dir/.credentials" "$dir/.credentials_rsaparams"
 cd "$dir"
+# Forget the old connection on this side only (GitHub already dropped it), incl. newer runners' extra files.
+sudo -u builder ./config.sh remove --local >/dev/null 2>&1 || true
+rm -f .runner .runner_migrated .credentials .credentials_migrated .credentials_rsaparams
 sudo -u builder ./config.sh --unattended --replace --name "$name" --labels android "$@"
 systemctl reset-failed "$unit" 2>/dev/null || true
 systemctl start "$unit"
