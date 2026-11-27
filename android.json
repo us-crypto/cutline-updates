@@ -1,7 +1,7 @@
 {
-  "versionCode": 7,
-  "versionName": "1.1.7",
-  "notes": "Check doubtful words fast, teach Cutline your names and words, and it learns your fixes. Bleep swear words with a soft sound (or turn it off). New caption looks and your own saved looks. AI edit: pick a length and platform, review every cut and sound, gentle sound effects placed with care. Free background music by mood. Brand kit: logo, look and handle in one tap. Export presets for TikTok, YouTube, Instagram and chats.",
+  "versionCode": 8,
+  "versionName": "1.1.8",
+  "notes": "Captions in noisy places are much better: no more skipped speech, and words Cutline isn't sure of are kept and marked for you to check. New Studio engine for the most accurate captions (slower). New 3-month Pro plan.",
   "apk": "https://raw.githubusercontent.com/us-crypto/cutline-updates/main/Cutline.apk",
-  "sha256": "2bcf4aec490b0ed1e3613280226f2c43429abae955cfd7883835c4958af5e643"
+  "sha256": "196b3f42eab491eb49527d4ed80df5965c2c1603cc3b5d68a7270d1d219aafd5"
 }
