@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # The build server's clock drifted hours behind, so GitHub rejected every runner login.
 # This sets the clock right now, keeps it right for good, and restarts the runners.
+# The 15-minute check waits while a build is running, so builds are never cut off.
 set -e
 timedatectl set-ntp true 2>/dev/null || true
 systemctl enable --now systemd-timesyncd 2>/dev/null || true
@@ -10,6 +11,8 @@ cat > /usr/local/bin/clock-check <<'C'
 # Sets the clock from GitHub's own time when it is more than a minute off.
 web=$(curl -fsSI --max-time 15 https://api.github.com | tr -d '\r' | sed -n 's/^[Dd]ate: //p')
 [ -n "$web" ] || exit 0
+# Never touch the clock or the runners while a build is running: it kills the build.
+pgrep -f Runner.Worker >/dev/null && exit 0
 diff=$(( $(date -u -d "$web" +%s) - $(date -u +%s) ))
 if [ ${diff#-} -gt 60 ]; then
   date -u -s "$web" >/dev/null
